@@ -2,9 +2,11 @@ import { FormEvent, useState } from 'react';
 import { PageHeader } from './components/PageHeader';
 import { QuoteForm } from './components/QuoteForm';
 import { QuoteResults } from './components/QuoteResults';
-import { ChartDatum } from './types/quotes';
+import { HistoryPanel } from './components/HistoryPanel';
+import { ChartDatum, QuoteResponse, QuoteQueryParams } from './types/quotes';
 import { AppError, parseApiError } from './types/errors';
 import { useRetry } from './hooks/useRetry';
+import { saveToHistory } from './utils/history';
 import {
   DEFAULT_TICKERS,
   addDays,
@@ -23,6 +25,7 @@ function App() {
   const [endDate, setEndDate] = useState(initialEnd);
   const [chartData, setChartData] = useState<ChartDatum[]>([]);
   const [seriesMeta, setSeriesMeta] = useState<string[]>([]);
+  const [lastResponse, setLastResponse] = useState<QuoteResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AppError | null>(null);
 
@@ -40,23 +43,36 @@ function App() {
     setLoading(true);
 
     try {
-      const payload = await executeWithRetry({
+      const params: QuoteQueryParams = {
         tickers,
         start: startDate,
         end: endDate,
-      });
+      };
+
+      const payload = await executeWithRetry(params);
 
       setSeriesMeta(payload.tickers ?? []);
       setChartData(normalizeChartData(payload.series ?? []));
+      setLastResponse(payload);
       setError(null);
+
+      // Salva no histórico
+      saveToHistory(params, payload);
     } catch (err) {
       const appError = parseApiError(err);
       setChartData([]);
       setSeriesMeta([]);
+      setLastResponse(null);
       setError(appError);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSelectHistory = (params: QuoteQueryParams) => {
+    setTickers(params.tickers);
+    setStartDate(params.start);
+    setEndDate(params.end);
   };
 
   const handleRetry = () => {
@@ -77,22 +93,30 @@ function App() {
           description="Informe tickers e intervalo de datas para visualizar os fechamentos simulados."
         />
 
-        <QuoteForm
-          tickers={tickers}
-          startDate={startDate}
-          endDate={endDate}
-          loading={loading || isRetrying}
-          onTickersChange={setTickers}
-          onStartDateChange={setStartDate}
-          onEndDateChange={setEndDate}
-          onSubmit={handleSubmit}
-        />
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1">
+            <QuoteForm
+              tickers={tickers}
+              startDate={startDate}
+              endDate={endDate}
+              loading={loading || isRetrying}
+              onTickersChange={setTickers}
+              onStartDateChange={setStartDate}
+              onEndDateChange={setEndDate}
+              onSubmit={handleSubmit}
+            />
+          </div>
+          <div className="pt-6">
+            <HistoryPanel onSelectHistory={handleSelectHistory} />
+          </div>
+        </div>
 
         <QuoteResults
           error={error}
           chartData={chartData}
           seriesMeta={seriesMeta}
           loading={loading}
+          lastResponse={lastResponse}
           onRetry={handleRetry}
         />
       </div>

@@ -9,9 +9,12 @@ import {
   Legend,
   CartesianGrid,
 } from 'recharts';
-import { ChartDatum } from '../types/quotes';
+import { ChartDatum, QuoteResponse } from '../types/quotes';
 import { ChartSkeleton } from './ChartSkeleton';
 import { ErrorMessage } from './ErrorMessage';
+import { IndicatorsPanel } from './IndicatorsPanel';
+import { ExportButtons } from './ExportButtons';
+import { calculateIndicators } from '../utils/indicators';
 import { AppError } from '../types/errors';
 
 const COLOR_PALETTES: string[][] = [
@@ -27,15 +30,28 @@ type QuoteResultsProps = {
   chartData: ChartDatum[];
   seriesMeta: string[];
   loading: boolean;
+  lastResponse?: QuoteResponse | null;
   onRetry?: () => void;
 };
 
-export function QuoteResults({ error, chartData, seriesMeta, loading, onRetry }: QuoteResultsProps) {
+export function QuoteResults({
+  error,
+  chartData,
+  seriesMeta,
+  loading,
+  lastResponse,
+  onRetry,
+}: QuoteResultsProps) {
   const hasData = chartData.length > 0;
   const palette = useMemo(
     () => COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)],
     [seriesMeta.join(',')] // Recalcula apenas quando os tickers mudarem
   );
+
+  const indicators = useMemo(() => {
+    if (!lastResponse?.series) return [];
+    return calculateIndicators(lastResponse.series);
+  }, [lastResponse]);
 
   return (
     <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 shadow-xl shadow-black/40">
@@ -58,6 +74,10 @@ export function QuoteResults({ error, chartData, seriesMeta, loading, onRetry }:
             <strong className="text-[var(--color-highlight)]">Resultados:</strong>
             <span>{seriesMeta.join(', ')}</span>
           </div>
+
+          <ExportButtons chartData={chartData} tickers={seriesMeta} fullData={lastResponse || undefined} />
+
+          {indicators.length > 0 && <IndicatorsPanel indicators={indicators} />}
 
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">

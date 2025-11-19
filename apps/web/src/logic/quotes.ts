@@ -2,6 +2,18 @@ import { ChartDatum, QuoteQueryParams, QuoteResponse, QuoteSeries } from '../typ
 
 export const DEFAULT_TICKERS = 'PETR4 VALE3';
 
+// Polyfill para AbortSignal.timeout (compatibilidade)
+function createTimeoutSignal(ms: number): AbortSignal {
+  if (typeof AbortSignal !== 'undefined' && 'timeout' in AbortSignal) {
+    return AbortSignal.timeout(ms);
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), ms);
+  // Cleanup será feito quando o signal for abortado
+  return controller.signal;
+}
+
 export async function fetchQuotes(params: QuoteQueryParams): Promise<QuoteResponse> {
   const searchParams = new URLSearchParams({
     tickers: params.tickers,
@@ -12,14 +24,14 @@ export async function fetchQuotes(params: QuoteQueryParams): Promise<QuoteRespon
   let response: Response;
   try {
     response = await fetch(`/quotes?${searchParams.toString()}`, {
-      signal: AbortSignal.timeout(10000), // 10s timeout
+      signal: createTimeoutSignal(10000), // 10s timeout
     });
   } catch (error) {
     if (error instanceof Error && error.name === 'TimeoutError') {
       throw new Error('Tempo de espera esgotado. Tente novamente.');
     }
     if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Requisição cancelada.');
+      throw new Error('Requisição cancelada ou tempo esgotado.');
     }
     throw error;
   }
