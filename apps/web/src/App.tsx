@@ -2,7 +2,7 @@ import { FormEvent, useState } from 'react';
 import { PageHeader } from './components/PageHeader';
 import { QuoteForm } from './components/QuoteForm';
 import { QuoteResults } from './components/QuoteResults';
-import { ChartDatum, QuoteResponse } from './types/quotes';
+import { ChartDatum } from './types/quotes';
 import {
   DEFAULT_TICKERS,
   addDays,
@@ -30,11 +30,11 @@ function App() {
     setLoading(true);
 
     try {
-      const payload = (await fetchQuotes({
+      const payload = await fetchQuotes({
         tickers,
         start: startDate,
         end: endDate,
-      })) as QuoteResponse;
+      });
 
       setSeriesMeta(payload.tickers ?? []);
       setChartData(normalizeChartData(payload.series ?? []));
@@ -49,10 +49,10 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4">
+    <div className="min-h-screen bg-[var(--color-bg-main)] py-10 px-4 text-[var(--color-text)]">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
         <PageHeader
-          title="Consulta Mockada de Ativos B3"
+          title="B3Challenge - Consulta de Ativos da B3"
           description="Informe tickers e intervalo de datas para visualizar os fechamentos simulados."
         />
 
