@@ -69,10 +69,34 @@ function App() {
     }
   };
 
-  const handleSelectHistory = (params: QuoteQueryParams) => {
+  const handleSelectHistory = async (params: QuoteQueryParams) => {
     setTickers(params.tickers);
     setStartDate(params.start);
     setEndDate(params.end);
+    
+    // Executa a consulta automaticamente
+    setError(null);
+    setLoading(true);
+
+    try {
+      const payload = await executeWithRetry(params);
+
+      setSeriesMeta(payload.tickers ?? []);
+      setChartData(normalizeChartData(payload.series ?? []));
+      setLastResponse(payload);
+      setError(null);
+
+      // Salva no histórico novamente (atualiza timestamp)
+      saveToHistory(params, payload);
+    } catch (err) {
+      const appError = parseApiError(err);
+      setChartData([]);
+      setSeriesMeta([]);
+      setLastResponse(null);
+      setError(appError);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleRetry = () => {
@@ -93,22 +117,19 @@ function App() {
           description="Informe tickers e intervalo de datas para visualizar os fechamentos simulados."
         />
 
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <QuoteForm
-              tickers={tickers}
-              startDate={startDate}
-              endDate={endDate}
-              loading={loading || isRetrying}
-              onTickersChange={setTickers}
-              onStartDateChange={setStartDate}
-              onEndDateChange={setEndDate}
-              onSubmit={handleSubmit}
-            />
-          </div>
-          <div className="pt-6">
-            <HistoryPanel onSelectHistory={handleSelectHistory} />
-          </div>
+        <QuoteForm
+          tickers={tickers}
+          startDate={startDate}
+          endDate={endDate}
+          loading={loading || isRetrying}
+          onTickersChange={setTickers}
+          onStartDateChange={setStartDate}
+          onEndDateChange={setEndDate}
+          onSubmit={handleSubmit}
+        />
+
+        <div className="flex justify-end">
+          <HistoryPanel onSelectHistory={handleSelectHistory} />
         </div>
 
         <QuoteResults

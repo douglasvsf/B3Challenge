@@ -10,8 +10,27 @@ export function HistoryPanel({ onSelectHistory }: HistoryPanelProps) {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
+  const refreshHistory = () => {
     setHistory(getHistory());
+  };
+
+  useEffect(() => {
+    refreshHistory();
+    
+    // Atualiza o histórico quando o localStorage mudar (outra aba/componente)
+    const handleStorageChange = () => {
+      refreshHistory();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Polling para detectar mudanças no mesmo contexto (já que storage event só funciona entre abas)
+    const interval = setInterval(refreshHistory, 1000);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleSelect = (entry: HistoryEntry) => {
@@ -26,9 +45,10 @@ export function HistoryPanel({ onSelectHistory }: HistoryPanelProps) {
     }
   };
 
-  const handleRemove = (id: string) => {
+  const handleRemove = (id: string, event: React.MouseEvent) => {
+    event.stopPropagation();
     removeHistoryEntry(id);
-    setHistory(getHistory());
+    refreshHistory();
   };
 
   if (history.length === 0) return null;
@@ -79,7 +99,7 @@ export function HistoryPanel({ onSelectHistory }: HistoryPanelProps) {
                       </div>
                     </div>
                     <button
-                      onClick={() => handleRemove(entry.id)}
+                      onClick={(e) => handleRemove(entry.id, e)}
                       className="ml-2 opacity-0 transition group-hover:opacity-100"
                       title="Remover"
                     >

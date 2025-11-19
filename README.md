@@ -88,8 +88,26 @@ B3Challenge/
 │       ├── public/          # Arquivos estáticos
 │       ├── src/
 │       │   ├── components/ # Componentes React
+│       │   │   ├── ChartSkeleton.tsx
+│       │   │   ├── ErrorMessage.tsx
+│       │   │   ├── ExportButtons.tsx
+│       │   │   ├── HistoryPanel.tsx
+│       │   │   ├── IndicatorsPanel.tsx
+│       │   │   ├── PageHeader.tsx
+│       │   │   ├── QuoteForm.tsx
+│       │   │   └── QuoteResults.tsx
+│       │   ├── hooks/       # Custom hooks
+│       │   │   └── useRetry.ts
 │       │   ├── logic/       # Lógica de negócio
+│       │   │   └── quotes.ts
 │       │   ├── types/       # Definições TypeScript
+│       │   │   ├── errors.ts
+│       │   │   └── quotes.ts
+│       │   ├── utils/       # Utilitários
+│       │   │   ├── export.ts
+│       │   │   ├── history.ts
+│       │   │   ├── indicators.ts
+│       │   │   └── validation.ts
 │       │   └── App.tsx      # Componente principal
 │       └── package.json
 ├── package.json             # Configuração do monorepo
@@ -98,11 +116,43 @@ B3Challenge/
 
 ## 🎯 Funcionalidades
 
+### Consulta e Visualização
 - ✅ Consulta múltiplos ativos simultaneamente (ex: PETR4, VALE3)
 - ✅ Seleção de intervalo de datas (início e fim)
-- ✅ Visualização em gráfico de linhas interativo
-- ✅ Tema escuro com paleta neon
-- ✅ Interface responsiva
+- ✅ Visualização em gráfico de linhas interativo com múltiplas séries
+- ✅ Tema escuro com paleta neon personalizada
+- ✅ Interface responsiva e moderna
+
+### Indicadores Técnicos
+- ✅ Variação percentual e absoluta (com cores indicativas)
+- ✅ Preço atual, máxima e mínima do período
+- ✅ Média móvel de 7 dias (MM7)
+- ✅ Média móvel de 30 dias (MM30) quando disponível
+- ✅ Formatação em R$ e percentual (pt-BR)
+
+### Exportação de Dados
+- ✅ Exportar gráfico para CSV (com encoding UTF-8)
+- ✅ Exportar dados completos para JSON
+- ✅ Download automático com nome baseado em data
+
+### Histórico de Consultas
+- ✅ Armazenamento local das últimas 10 consultas
+- ✅ Painel dropdown com consultas recentes
+- ✅ Seleção rápida que preenche formulário e executa consulta automaticamente
+- ✅ Formatação de data relativa ("Agora", "5 min atrás", etc.)
+- ✅ Remoção individual ou limpeza completa do histórico
+
+### Tratamento de Erros e Validação
+- ✅ Validação de formulário em tempo real
+- ✅ Validação de formato de tickers (AAAA11)
+- ✅ Validação de intervalo de datas (mínimo 1 dia, máximo 365 dias)
+- ✅ Mensagens de erro específicas e categorizadas
+- ✅ Retry automático em falhas de rede (até 3 tentativas)
+- ✅ Timeout de requisições (10 segundos)
+- ✅ Skeleton screens durante carregamento
+- ✅ Feedback visual em todos os estados (loading, erro, sucesso)
+
+### Dados
 - ✅ Dados mockados determinísticos para demonstração
 
 ## 📝 Scripts Disponíveis
@@ -169,6 +219,42 @@ O projeto utiliza um tema escuro com as seguintes cores:
 - **Fundo secundário**: `#0A0A0A` (Preto suave)
 - **Texto**: `#E5E5E5` (Cinza claro)
 - **Destaques**: `#1EFFD2` (Verde neon claro)
+
+### Cores do Gráfico
+
+As linhas do gráfico utilizam paletas variadas sem verde, incluindo:
+- Vermelhos e Rosas
+- Laranjas e Amarelos
+- Azuis
+- Roxos e Violetas
+
+## 💡 Recursos Avançados
+
+### Validação de Formulário
+- Validação em tempo real dos campos
+- Formato de ticker: AAAA11 (ex: PETR4, VALE3)
+- Máximo de 10 tickers por consulta
+- Intervalo de datas: mínimo 1 dia, máximo 365 dias
+- Feedback visual com bordas coloridas em caso de erro
+
+### Tratamento de Erros
+- Categorização de erros (Rede, Validação, API, Desconhecido)
+- Mensagens específicas e acionáveis
+- Retry automático para erros de rede (3 tentativas com delay progressivo)
+- Botão de retry manual em mensagens de erro
+- Timeout de 10 segundos nas requisições
+
+### Performance
+- Memoização de cálculos pesados (indicadores, paletas)
+- Skeleton screens para melhor percepção de carregamento
+- Lazy loading de componentes quando aplicável
+- Otimização de re-renders com React.memo e useMemo
+
+### Acessibilidade
+- Mensagens de erro com `role="alert"`
+- Labels descritivos nos campos
+- Navegação por teclado
+- Contraste adequado em todos os elementos
 
 ## 📄 Licença
 
