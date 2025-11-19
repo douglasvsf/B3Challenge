@@ -15,9 +15,9 @@ Full-stack system developed as a technical challenge that allows querying multip
 - **Create React App** as base
 
 ### Backend
-- **Node.js** with **Express**
+- **Node.js** with **Express** and **TypeScript**
 - **CORS** enabled for frontend communication
-- **Nodemon** for hot-reload in development
+- **Nodemon** with **ts-node** for hot-reload in development
 
 ### Infrastructure
 - **Monorepo** with npm workspaces
@@ -82,7 +82,9 @@ B3Challenge/
 ├── apps/
 │   ├── api/                 # Express Backend
 │   │   ├── src/
-│   │   │   └── index.js     # Server and API routes
+│   │   │   ├── index.ts     # Server and API routes
+│   │   │   └── types/       # TypeScript definitions
+│   │   ├── tsconfig.json    # TypeScript configuration
 │   │   └── package.json
 │   └── web/                 # React Frontend
 │       ├── public/          # Static files

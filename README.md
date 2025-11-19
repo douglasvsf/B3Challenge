@@ -15,9 +15,9 @@ Sistema full-stack desenvolvido como desafio técnico que permite consultar múl
 - **Create React App** como base
 
 ### Backend
-- **Node.js** com **Express**
+- **Node.js** com **Express** e **TypeScript**
 - **CORS** habilitado para comunicação com frontend
-- **Nodemon** para hot-reload em desenvolvimento
+- **Nodemon** com **ts-node** para hot-reload em desenvolvimento
 
 ### Infraestrutura
 - **Monorepo** com npm workspaces
@@ -82,7 +82,9 @@ B3Challenge/
 ├── apps/
 │   ├── api/                 # Backend Express
 │   │   ├── src/
-│   │   │   └── index.js     # Servidor e rotas da API
+│   │   │   ├── index.ts     # Servidor e rotas da API
+│   │   │   └── types/       # Definições TypeScript
+│   │   ├── tsconfig.json    # Configuração TypeScript
 │   │   └── package.json
 │   └── web/                 # Frontend React
 │       ├── public/          # Arquivos estáticos
