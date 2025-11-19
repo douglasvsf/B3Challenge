@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -9,36 +10,49 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { ChartDatum } from '../types/quotes';
+import { ChartSkeleton } from './ChartSkeleton';
+import { ErrorMessage } from './ErrorMessage';
+import { AppError } from '../types/errors';
 
 const COLOR_PALETTES: string[][] = [
-  ['#00e6b0', '#1effd2', '#00b894', '#3df7c7', '#2ed1a8', '#54ffc6'],
   ['#ff6b6b', '#f39c12', '#f1c40f', '#3498db', '#9b59b6', '#e91e63'],
-  ['#4ade80', '#f87171', '#60a5fa', '#facc15', '#c084fc', '#fb923c'],
+  ['#f87171', '#60a5fa', '#facc15', '#c084fc', '#fb923c', '#ec4899'],
+  ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#f97316'],
+  ['#dc2626', '#ea580c', '#2563eb', '#7c3aed', '#db2777', '#f472b6'],
+  ['#be123c', '#c2410c', '#1e40af', '#6d28d9', '#be185d', '#a855f7'],
 ];
 
 type QuoteResultsProps = {
-  error: string;
+  error: AppError | null;
   chartData: ChartDatum[];
   seriesMeta: string[];
+  loading: boolean;
+  onRetry?: () => void;
 };
 
-export function QuoteResults({ error, chartData, seriesMeta }: QuoteResultsProps) {
+export function QuoteResults({ error, chartData, seriesMeta, loading, onRetry }: QuoteResultsProps) {
   const hasData = chartData.length > 0;
-  const palette = COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
+  const palette = useMemo(
+    () => COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)],
+    [seriesMeta.join(',')] // Recalcula apenas quando os tickers mudarem
+  );
 
   return (
     <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 shadow-xl shadow-black/40">
-      {error && (
-        <p className="mb-4 rounded-lg border border-red-400/50 bg-red-900/30 px-4 py-3 text-sm font-medium text-red-200">
-          {error}
-        </p>
+      {error && <ErrorMessage error={error} onRetry={onRetry} />}
+
+      {loading && <ChartSkeleton />}
+
+      {!hasData && !error && !loading && (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="mb-4 text-4xl opacity-50">📊</div>
+          <p className="text-sm text-[var(--color-muted)]">
+            Preencha o formulário acima para gerar o gráfico.
+          </p>
+        </div>
       )}
 
-      {!hasData && !error && (
-        <p className="text-sm text-[var(--color-muted)]">Preencha o formulário acima para gerar o gráfico.</p>
-      )}
-
-      {hasData && (
+      {hasData && !loading && (
         <>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2 text-sm text-[var(--color-muted)]">
             <strong className="text-[var(--color-highlight)]">Resultados:</strong>

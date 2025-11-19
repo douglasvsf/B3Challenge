@@ -9,14 +9,42 @@ export async function fetchQuotes(params: QuoteQueryParams): Promise<QuoteRespon
     end: params.end,
   });
 
-  const response = await fetch(`/quotes?${searchParams.toString()}`);
-
-  if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(payload?.error || 'Erro ao consultar API.');
+  let response: Response;
+  try {
+    response = await fetch(`/quotes?${searchParams.toString()}`, {
+      signal: AbortSignal.timeout(10000), // 10s timeout
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'TimeoutError') {
+      throw new Error('Tempo de espera esgotado. Tente novamente.');
+    }
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Requisição cancelada.');
+    }
+    throw error;
   }
 
-  return (await response.json()) as QuoteResponse;
+  if (!response.ok) {
+    const statusText = response.statusText || `Erro ${response.status}`;
+    let errorMessage = `Erro ${response.status}: ${statusText}`;
+
+    try {
+      const payload = (await response.json()) as { error?: string } | null;
+      if (payload?.error) {
+        errorMessage = payload.error;
+      }
+    } catch {
+      // Se não conseguir parsear JSON, usa a mensagem padrão
+    }
+
+    throw new Error(errorMessage);
+  }
+
+  try {
+    return (await response.json()) as QuoteResponse;
+  } catch (error) {
+    throw new Error('Erro ao processar resposta da API. Formato inválido.');
+  }
 }
 
 export function normalizeChartData(series: QuoteSeries[] = []): ChartDatum[] {

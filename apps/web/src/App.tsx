@@ -3,6 +3,8 @@ import { PageHeader } from './components/PageHeader';
 import { QuoteForm } from './components/QuoteForm';
 import { QuoteResults } from './components/QuoteResults';
 import { ChartDatum } from './types/quotes';
+import { AppError, parseApiError } from './types/errors';
+import { useRetry } from './hooks/useRetry';
 import {
   DEFAULT_TICKERS,
   addDays,
@@ -22,15 +24,23 @@ function App() {
   const [chartData, setChartData] = useState<ChartDatum[]>([]);
   const [seriesMeta, setSeriesMeta] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<AppError | null>(null);
+
+  const { executeWithRetry, isRetrying } = useRetry(fetchQuotes, {
+    maxRetries: 3,
+    delay: 1000,
+    onRetry: (attempt) => {
+      console.log(`Tentativa ${attempt} de 3...`);
+    },
+  });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setError('');
+    setError(null);
     setLoading(true);
 
     try {
-      const payload = await fetchQuotes({
+      const payload = await executeWithRetry({
         tickers,
         start: startDate,
         end: endDate,
@@ -38,14 +48,25 @@ function App() {
 
       setSeriesMeta(payload.tickers ?? []);
       setChartData(normalizeChartData(payload.series ?? []));
+      setError(null);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Falha inesperada.';
+      const appError = parseApiError(err);
       setChartData([]);
       setSeriesMeta([]);
-      setError(message);
+      setError(appError);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRetry = () => {
+    if (error?.retryable) {
+      handleSubmit({ preventDefault: () => {} } as FormEvent<HTMLFormElement>);
+    }
+  };
+
+  const handleDismissError = () => {
+    setError(null);
   };
 
   return (
@@ -60,14 +81,20 @@ function App() {
           tickers={tickers}
           startDate={startDate}
           endDate={endDate}
-          loading={loading}
+          loading={loading || isRetrying}
           onTickersChange={setTickers}
           onStartDateChange={setStartDate}
           onEndDateChange={setEndDate}
           onSubmit={handleSubmit}
         />
 
-        <QuoteResults error={error} chartData={chartData} seriesMeta={seriesMeta} />
+        <QuoteResults
+          error={error}
+          chartData={chartData}
+          seriesMeta={seriesMeta}
+          loading={loading}
+          onRetry={handleRetry}
+        />
       </div>
     </div>
   );
