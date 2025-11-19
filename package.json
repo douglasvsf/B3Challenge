@@ -1,0 +1,19 @@
+{
+  "name": "b3challenge",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "web": "cross-env HOST=127.0.0.1 DANGEROUSLY_DISABLE_HOST_CHECK=true npm run start --workspace web",
+    "web:build": "npm run build --workspace web",
+    "api": "npm run dev --workspace api",
+    "dev": "concurrently \"npm run api\" \"npm run web\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "cross-env": "^10.1.0"
+  }
+}
