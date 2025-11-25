@@ -75,7 +75,7 @@ export function QuoteForm({
 
   return (
     <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 shadow-xl shadow-black/40">
-      <form className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" onSubmit={handleSubmit}>
+      <form className="grid gap-4 md:grid-cols-4" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-2">
           <label className="text-sm font-semibold text-[var(--color-muted)]">
             API de Cotações
@@ -90,7 +90,7 @@ export function QuoteForm({
           </select>
         </div>
 
-        <div className="flex flex-col gap-2 md:col-span-2">
+        <div className="flex flex-col gap-2 md:col-span-3">
           <label className="text-sm font-semibold text-[var(--color-muted)]">
             Ativos (separe por espaço ou vírgula)
           </label>
@@ -114,7 +114,7 @@ export function QuoteForm({
           )}
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 md:col-span-2">
           <label className="text-sm font-semibold text-[var(--color-muted)]">Data inicial</label>
           <input
             type="date"
@@ -131,7 +131,7 @@ export function QuoteForm({
           />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 md:col-span-2">
           <label className="text-sm font-semibold text-[var(--color-muted)]">Data final</label>
           <input
             type="date"

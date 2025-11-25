@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { HistoryEntry, getHistory, clearHistory, removeHistoryEntry, formatHistoryDate } from '../utils/history';
-import { QuoteQueryParams } from '../types/quotes';
+import { QuoteQueryParams, ApiProvider } from '../types/quotes';
 
 type HistoryPanelProps = {
   onSelectHistory: (params: QuoteQueryParams) => void;
@@ -88,8 +88,15 @@ export function HistoryPanel({ onSelectHistory }: HistoryPanelProps) {
                 >
                   <div className="mb-2 flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="text-xs font-semibold text-[var(--color-text)]">
-                        {entry.params.tickers}
+                      <div className="flex items-center gap-2">
+                        <div className="text-xs font-semibold text-[var(--color-text)]">
+                          {entry.params.tickers}
+                        </div>
+                        {entry.params.api && (
+                          <span className="rounded bg-[var(--color-primary)]/20 px-1.5 py-0.5 text-[10px] font-semibold text-[var(--color-primary)]">
+                            {entry.params.api === 'brapi' ? 'BRAPI' : 'Yahoo'}
+                          </span>
+                        )}
                       </div>
                       <div className="text-xs text-[var(--color-muted)]">
                         {entry.params.start} → {entry.params.end}

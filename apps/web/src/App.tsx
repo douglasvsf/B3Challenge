@@ -75,6 +75,9 @@ function App() {
     setTickers(params.tickers);
     setStartDate(params.start);
     setEndDate(params.end);
+    if (params.api) {
+      setApi(params.api);
+    }
     
     // Executa a consulta automaticamente
     setError(null);

@@ -20,12 +20,19 @@ export function saveToHistory(params: QuoteQueryParams, result: QuoteResponse): 
       result,
     };
 
-    // Remove duplicatas (mesmos tickers e datas)
+    // Remove duplicatas (mesmos tickers, datas e API)
+    // Normaliza API para comparação (undefined/null são tratados como 'yahoo' padrão)
+    const normalizedApi = params.api || 'yahoo';
     const filtered = history.filter(
-      (entry) =>
-        entry.params.tickers !== params.tickers ||
-        entry.params.start !== params.start ||
-        entry.params.end !== params.end
+      (entry) => {
+        const entryApi = entry.params.api || 'yahoo';
+        return (
+          entry.params.tickers !== params.tickers ||
+          entry.params.start !== params.start ||
+          entry.params.end !== params.end ||
+          entryApi !== normalizedApi
+        );
+      }
     );
 
     // Adiciona no início e limita ao máximo
