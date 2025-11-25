@@ -17,9 +17,12 @@ export interface QuoteResponse {
   series: QuoteSeries[];
 }
 
+export type ApiProvider = 'yahoo' | 'brapi';
+
 export interface QuoteQuery {
   tickers?: string;
   start?: string;
   end?: string;
+  api?: ApiProvider;
 }
 

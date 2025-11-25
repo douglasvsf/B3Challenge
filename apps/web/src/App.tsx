@@ -3,7 +3,7 @@ import { PageHeader } from './components/PageHeader';
 import { QuoteForm } from './components/QuoteForm';
 import { QuoteResults } from './components/QuoteResults';
 import { HistoryPanel } from './components/HistoryPanel';
-import { ChartDatum, QuoteResponse, QuoteQueryParams } from './types/quotes';
+import { ChartDatum, QuoteResponse, QuoteQueryParams, ApiProvider } from './types/quotes';
 import { AppError, parseApiError } from './types/errors';
 import { useRetry } from './hooks/useRetry';
 import { saveToHistory } from './utils/history';
@@ -23,6 +23,7 @@ function App() {
   const [tickers, setTickers] = useState(DEFAULT_TICKERS);
   const [startDate, setStartDate] = useState(initialStart);
   const [endDate, setEndDate] = useState(initialEnd);
+  const [api, setApi] = useState<ApiProvider>('yahoo');
   const [chartData, setChartData] = useState<ChartDatum[]>([]);
   const [seriesMeta, setSeriesMeta] = useState<string[]>([]);
   const [lastResponse, setLastResponse] = useState<QuoteResponse | null>(null);
@@ -47,6 +48,7 @@ function App() {
         tickers,
         start: startDate,
         end: endDate,
+        api,
       };
 
       const payload = await executeWithRetry(params);
@@ -121,10 +123,12 @@ function App() {
           tickers={tickers}
           startDate={startDate}
           endDate={endDate}
+          api={api}
           loading={loading || isRetrying}
           onTickersChange={setTickers}
           onStartDateChange={setStartDate}
           onEndDateChange={setEndDate}
+          onApiChange={setApi}
           onSubmit={handleSubmit}
         />
 

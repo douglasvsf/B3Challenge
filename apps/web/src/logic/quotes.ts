@@ -20,6 +20,11 @@ export async function fetchQuotes(params: QuoteQueryParams): Promise<QuoteRespon
     start: params.start,
     end: params.end,
   });
+  
+  // Adiciona o parâmetro de API se fornecido
+  if (params.api) {
+    searchParams.append('api', params.api);
+  }
 
   let response: Response;
   try {

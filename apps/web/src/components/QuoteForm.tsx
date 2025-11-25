@@ -1,14 +1,18 @@
 import { FormEvent, useState, useEffect } from 'react';
 import { validateTickers, validateDateRange } from '../utils/validation';
 
+import { ApiProvider } from '../types/quotes';
+
 type QuoteFormProps = {
   tickers: string;
   startDate: string;
   endDate: string;
+  api: ApiProvider;
   loading: boolean;
   onTickersChange(value: string): void;
   onStartDateChange(value: string): void;
   onEndDateChange(value: string): void;
+  onApiChange(value: ApiProvider): void;
   onSubmit(event: FormEvent<HTMLFormElement>): void;
 };
 
@@ -16,10 +20,12 @@ export function QuoteForm({
   tickers,
   startDate,
   endDate,
+  api,
   loading,
   onTickersChange,
   onStartDateChange,
   onEndDateChange,
+  onApiChange,
   onSubmit,
 }: QuoteFormProps) {
   const [tickerError, setTickerError] = useState<string | null>(null);
@@ -70,6 +76,20 @@ export function QuoteForm({
   return (
     <section className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-6 shadow-xl shadow-black/40">
       <form className="grid gap-4 md:grid-cols-2 lg:grid-cols-4" onSubmit={handleSubmit}>
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-semibold text-[var(--color-muted)]">
+            API de Cotações
+          </label>
+          <select
+            value={api}
+            onChange={(event) => onApiChange(event.target.value as ApiProvider)}
+            className="h-11 rounded-lg border border-[var(--color-border)] bg-[#050505] px-3 text-base font-normal text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30"
+          >
+            <option value="yahoo">Yahoo Finance</option>
+            <option value="brapi">BRAPI</option>
+          </select>
+        </div>
+
         <div className="flex flex-col gap-2 md:col-span-2">
           <label className="text-sm font-semibold text-[var(--color-muted)]">
             Ativos (separe por espaço ou vírgula)
@@ -134,6 +154,14 @@ export function QuoteForm({
         </div>
 
         <div className="md:col-span-2 lg:col-span-4">
+          <p className="mb-2 text-xs text-[var(--color-muted)]">
+            {api === 'yahoo' 
+              ? 'Usando Yahoo Finance para buscar cotações reais da B3.'
+              : 'Usando BRAPI (API brasileira) para buscar cotações reais da B3.'}
+          </p>
+        </div>
+
+        <div className="md:col-span-2 lg:col-span-4">
           <button
             type="submit"
             disabled={loading || !!tickerError || !!dateError}
@@ -152,7 +180,7 @@ export function QuoteForm({
       </form>
 
       <p className="mt-4 text-sm text-[var(--color-muted)]">
-        Todo o retorno é mockado no backend Express, simulando oscilações diárias para cada ticker.
+        Consultando cotações reais da B3 através de APIs públicas.
       </p>
     </section>
   );
