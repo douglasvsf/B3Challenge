@@ -1,10 +1,10 @@
 # B3Challenge
 
-Dashboard mockado para consulta de preços de fechamento diário de ativos da B3 com visualização em gráfico interativo.
+Dashboard para consulta de preços de fechamento diário de ativos da B3 com visualização em gráfico interativo usando APIs públicas reais.
 
 ## 📋 Sobre o Projeto
 
-Sistema full-stack desenvolvido como desafio técnico que permite consultar múltiplos ativos da B3 simulando preços de fechamento diário. O frontend exibe os resultados em um gráfico de linhas responsivo com tema escuro neon, enquanto o backend fornece uma API mockada que gera dados determinísticos para demonstração.
+Sistema full-stack desenvolvido como desafio técnico que permite consultar múltiplos ativos da B3 utilizando APIs públicas reais (Yahoo Finance e BRAPI). O frontend exibe os resultados em um gráfico de linhas responsivo com tema escuro neon, enquanto o backend integra-se com APIs públicas para buscar cotações históricas reais da B3.
 
 ## 🛠️ Tecnologias
 
@@ -16,8 +16,11 @@ Sistema full-stack desenvolvido como desafio técnico que permite consultar múl
 
 ### Backend
 - **Node.js** com **Express** e **TypeScript**
+- **Axios** para requisições HTTP
 - **CORS** habilitado para comunicação com frontend
 - **Nodemon** com **ts-node** para hot-reload em desenvolvimento
+- **Jest** para testes unitários
+- Integração com **Yahoo Finance API** e **BRAPI** para cotações reais
 
 ### Infraestrutura
 - **Monorepo** com npm workspaces
@@ -83,6 +86,9 @@ B3Challenge/
 │   ├── api/                 # Backend Express
 │   │   ├── src/
 │   │   │   ├── index.ts     # Servidor e rotas da API
+│   │   │   ├── controllers/ # Controllers
+│   │   │   ├── services/    # Services (B3Service, BrapiService)
+│   │   │   ├── routes/      # Rotas
 │   │   │   └── types/       # Definições TypeScript
 │   │   ├── tsconfig.json    # Configuração TypeScript
 │   │   └── package.json
@@ -120,6 +126,7 @@ B3Challenge/
 
 ### Consulta e Visualização
 - ✅ Consulta múltiplos ativos simultaneamente (ex: PETR4, VALE3)
+- ✅ Seleção de API de cotações (Yahoo Finance ou BRAPI)
 - ✅ Seleção de intervalo de datas (início e fim)
 - ✅ Visualização em gráfico de linhas interativo com múltiplas séries
 - ✅ Tema escuro com paleta neon personalizada
@@ -139,6 +146,7 @@ B3Challenge/
 
 ### Histórico de Consultas
 - ✅ Armazenamento local das últimas 10 consultas
+- ✅ Histórico diferenciado por API selecionada
 - ✅ Painel dropdown com consultas recentes
 - ✅ Seleção rápida que preenche formulário e executa consulta automaticamente
 - ✅ Formatação de data relativa ("Agora", "5 min atrás", etc.)
@@ -155,7 +163,10 @@ B3Challenge/
 - ✅ Feedback visual em todos os estados (loading, erro, sucesso)
 
 ### Dados
-- ✅ Dados mockados determinísticos para demonstração
+- ✅ Cotações reais da B3 através de APIs públicas
+- ✅ Suporte a Yahoo Finance (padrão)
+- ✅ Suporte a BRAPI (API brasileira)
+- ✅ Seleção de API pelo usuário
 
 ## 📝 Scripts Disponíveis
 
@@ -165,6 +176,11 @@ Na raiz do projeto:
 - `npm run api` - Inicia apenas o backend
 - `npm run web` - Inicia apenas o frontend
 - `npm run web:build` - Gera build de produção do frontend
+
+No diretório `apps/api`:
+- `npm test` - Executa testes unitários
+- `npm run test:watch` - Executa testes em modo watch
+- `npm run test:coverage` - Gera relatório de cobertura de testes
 
 ## 🔌 API Endpoints
 
@@ -179,16 +195,18 @@ Retorna status da API.
 ```
 
 ### GET `/quotes`
-Consulta preços mockados de ativos.
+Consulta preços reais de ativos da B3 através de APIs públicas.
 
 **Query Parameters:**
 - `tickers` (obrigatório): Lista de tickers separados por espaço ou vírgula (ex: `PETR4 VALE3`)
 - `start` (obrigatório): Data inicial no formato `YYYY-MM-DD`
 - `end` (obrigatório): Data final no formato `YYYY-MM-DD`
+- `api` (opcional): API a ser utilizada (`yahoo` ou `brapi`). Padrão: `yahoo`
 
 **Exemplo:**
 ```
-GET /quotes?tickers=PETR4%20VALE3&start=2024-01-01&end=2024-01-07
+GET /quotes?tickers=PETR4%20VALE3&start=2024-01-01&end=2024-01-07&api=yahoo
+GET /quotes?tickers=PETR4%20VALE3&start=2024-01-01&end=2024-01-07&api=brapi
 ```
 
 **Resposta:**
@@ -268,5 +286,5 @@ Desenvolvido para o B3Challenge.
 
 ---
 
-**Nota**: Este projeto utiliza dados mockados para fins de demonstração. Os preços gerados são determinísticos baseados no ticker e data, mas não representam valores reais da B3.
+**Nota**: Este projeto utiliza APIs públicas reais (Yahoo Finance e BRAPI) para buscar cotações históricas da B3. Os dados retornados são valores reais de fechamento dos ativos negociados na bolsa brasileira.
 

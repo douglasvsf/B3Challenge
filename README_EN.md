@@ -1,10 +1,10 @@
 # B3Challenge
 
-Mocked dashboard for querying daily closing prices of B3 assets with interactive chart visualization.
+Dashboard for querying daily closing prices of B3 assets with interactive chart visualization using real public APIs.
 
 ## 📋 About the Project
 
-Full-stack system developed as a technical challenge that allows querying multiple B3 assets by simulating daily closing prices. The frontend displays results in a responsive dark neon-themed line chart, while the backend provides a mocked API that generates deterministic data for demonstration purposes.
+Full-stack system developed as a technical challenge that allows querying multiple B3 assets using real public APIs (Yahoo Finance and BRAPI). The frontend displays results in a responsive dark neon-themed line chart, while the backend integrates with public APIs to fetch real historical quotes from B3.
 
 ## 🛠️ Technologies
 
@@ -16,8 +16,11 @@ Full-stack system developed as a technical challenge that allows querying multip
 
 ### Backend
 - **Node.js** with **Express** and **TypeScript**
+- **Axios** for HTTP requests
 - **CORS** enabled for frontend communication
 - **Nodemon** with **ts-node** for hot-reload in development
+- **Jest** for unit testing
+- Integration with **Yahoo Finance API** and **BRAPI** for real quotes
 
 ### Infrastructure
 - **Monorepo** with npm workspaces
@@ -83,6 +86,9 @@ B3Challenge/
 │   ├── api/                 # Express Backend
 │   │   ├── src/
 │   │   │   ├── index.ts     # Server and API routes
+│   │   │   ├── controllers/ # Controllers
+│   │   │   ├── services/    # Services (B3Service, BrapiService)
+│   │   │   ├── routes/      # Routes
 │   │   │   └── types/       # TypeScript definitions
 │   │   ├── tsconfig.json    # TypeScript configuration
 │   │   └── package.json
@@ -120,6 +126,7 @@ B3Challenge/
 
 ### Query and Visualization
 - ✅ Query multiple assets simultaneously (e.g., PETR4, VALE3)
+- ✅ API selection for quotes (Yahoo Finance or BRAPI)
 - ✅ Date range selection (start and end)
 - ✅ Interactive line chart visualization with multiple series
 - ✅ Dark theme with custom neon palette
@@ -139,6 +146,7 @@ B3Challenge/
 
 ### Query History
 - ✅ Local storage of last 10 queries
+- ✅ History differentiated by selected API
 - ✅ Dropdown panel with recent queries
 - ✅ Quick selection that fills form and automatically executes query
 - ✅ Relative date formatting ("Now", "5 min ago", etc.)
@@ -155,7 +163,10 @@ B3Challenge/
 - ✅ Visual feedback in all states (loading, error, success)
 
 ### Data
-- ✅ Deterministic mocked data for demonstration
+- ✅ Real B3 quotes through public APIs
+- ✅ Yahoo Finance support (default)
+- ✅ BRAPI support (Brazilian API)
+- ✅ User-selectable API
 
 ## 📝 Available Scripts
 
@@ -165,6 +176,11 @@ At the project root:
 - `npm run api` - Starts backend only
 - `npm run web` - Starts frontend only
 - `npm run web:build` - Generates production build of frontend
+
+In `apps/api` directory:
+- `npm test` - Runs unit tests
+- `npm run test:watch` - Runs tests in watch mode
+- `npm run test:coverage` - Generates test coverage report
 
 ## 🔌 API Endpoints
 
@@ -179,16 +195,18 @@ Returns API status.
 ```
 
 ### GET `/quotes`
-Queries mocked asset prices.
+Queries real B3 asset prices through public APIs.
 
 **Query Parameters:**
 - `tickers` (required): List of tickers separated by space or comma (e.g., `PETR4 VALE3`)
 - `start` (required): Start date in `YYYY-MM-DD` format
 - `end` (required): End date in `YYYY-MM-DD` format
+- `api` (optional): API to use (`yahoo` or `brapi`). Default: `yahoo`
 
 **Example:**
 ```
-GET /quotes?tickers=PETR4%20VALE3&start=2024-01-01&end=2024-01-07
+GET /quotes?tickers=PETR4%20VALE3&start=2024-01-01&end=2024-01-07&api=yahoo
+GET /quotes?tickers=PETR4%20VALE3&start=2024-01-01&end=2024-01-07&api=brapi
 ```
 
 **Response:**
@@ -268,5 +286,5 @@ Developed for B3Challenge.
 
 ---
 
-**Note**: This project uses mocked data for demonstration purposes. Generated prices are deterministic based on ticker and date, but do not represent real B3 values.
+**Note**: This project uses real public APIs (Yahoo Finance and BRAPI) to fetch historical quotes from B3. The returned data consists of real closing prices of assets traded on the Brazilian stock exchange.
 
