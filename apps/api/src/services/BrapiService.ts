@@ -31,7 +31,6 @@ export class BrapiService {
       const results = response.data?.results;
       
       if (!results || results.length === 0) {
-        console.error(`[BrapiService] Nenhum resultado encontrado. Resposta:`, JSON.stringify(response.data, null, 2));
         throw new Error(`Nenhum dado encontrado para o ticker ${ticker}`);
       }
 
