@@ -2,7 +2,7 @@ import axios from 'axios';
 import { QuoteSeries, QuotePoint } from '../types';
 
 export class BrapiService {
-  private readonly brapiBaseUrl = 'https://brapi.dev/api';
+  private readonly brapiBaseUrl = process.env.BRAPI_BASE_URL || 'https://brapi.dev/api';
 
   /**
    * Busca cotações reais da B3 usando BRAPI

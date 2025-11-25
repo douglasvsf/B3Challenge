@@ -2,7 +2,7 @@ import axios from 'axios';
 import { QuoteSeries, QuotePoint } from '../types';
 
 export class B3Service {
-  private readonly yahooFinanceBaseUrl = 'https://query1.finance.yahoo.com/v8/finance/chart';
+  private readonly yahooFinanceBaseUrl = process.env.YAHOO_FINANCE_BASE_URL || 'https://query1.finance.yahoo.com/v8/finance/chart';
 
   /**
    * Busca cotações reais da B3 usando Yahoo Finance API

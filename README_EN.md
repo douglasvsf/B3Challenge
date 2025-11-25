@@ -50,7 +50,23 @@ npm install
 
 This command will automatically install dependencies for all workspaces (`apps/web` and `apps/api`).
 
-### 3. Run the project
+### 3. Configure environment variables (optional)
+
+In the `apps/api` directory, copy the example file and configure the API URLs:
+
+```bash
+cd apps/api
+cp env.example .env
+```
+
+Available environment variables:
+- `PORT`: Server port (default: 3001)
+- `YAHOO_FINANCE_BASE_URL`: Yahoo Finance API base URL (default: https://query1.finance.yahoo.com/v8/finance/chart)
+- `BRAPI_BASE_URL`: BRAPI base URL (default: https://brapi.dev/api)
+
+**Note**: If you don't create the `.env` file, the system will use the default API values.
+
+### 4. Run the project
 
 #### Option 1: Run frontend and backend together (recommended)
 
@@ -74,7 +90,7 @@ npm run api
 npm run web
 ```
 
-### 4. Access the application
+### 5. Access the application
 
 Open your browser at `http://localhost:3000`
 
